@@ -9,3 +9,13 @@ target_link_libraries(plugin_zox_ngc PUBLIC
 	solanaceae_zox
 )
 
+########################################
+
+add_library(plugin_zox_ngc_hs SHARED
+	./plugin_zox_ngc_hs.cpp
+)
+
+target_link_libraries(plugin_zox_ngc_hs PUBLIC
+	solanaceae_plugin
+	solanaceae_zox
+)
