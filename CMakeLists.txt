@@ -48,5 +48,5 @@ endif()
 
 # cmake setup end
 
-#add_subdirectory(./src)
+add_subdirectory(./plugins)
 
