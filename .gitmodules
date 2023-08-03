@@ -23,3 +23,6 @@
 [submodule "external/solanaceae_tox"]
 	path = external/solanaceae_tox
 	url = https://github.com/Green-Sky/solanaceae_tox.git
+[submodule "external/solanaceae_zox"]
+	path = external/solanaceae_zox
+	url = https://github.com/Green-Sky/solanaceae_zox.git
