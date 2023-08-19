@@ -26,3 +26,6 @@
 [submodule "external/solanaceae_zox"]
 	path = external/solanaceae_zox
 	url = https://github.com/Green-Sky/solanaceae_zox.git
+[submodule "external/solanaceae_ngc_ft1"]
+	path = external/solanaceae_ngc_ft1
+	url = https://github.com/Green-Sky/solanaceae_ngc_ft1.git

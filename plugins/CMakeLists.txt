@@ -1,5 +1,18 @@
 cmake_minimum_required(VERSION 3.9 FATAL_ERROR)
 
+add_library(plugin_ngcft1 SHARED
+	./plugin_ngcft1.cpp
+)
+
+target_link_libraries(plugin_ngcft1 PUBLIC
+	solanaceae_plugin
+	solanaceae_ngcext
+	solanaceae_ngcft1
+	solanaceae_sha1_ngcft1
+)
+
+########################################
+
 add_library(plugin_zox_ngc SHARED
 	./plugin_zox_ngc.cpp
 )
