@@ -32,3 +32,17 @@ target_link_libraries(plugin_zox_ngc_hs PUBLIC
 	solanaceae_plugin
 	solanaceae_zox
 )
+
+########################################
+
+add_library(plugin_transfer_auto_accept SHARED
+	./plugin_transfer_auto_accept.cpp
+	./transfer_auto_accept.hpp
+	./transfer_auto_accept.cpp
+)
+
+target_link_libraries(plugin_transfer_auto_accept PUBLIC
+	solanaceae_plugin
+	solanaceae_util
+	solanaceae_message3
+)
