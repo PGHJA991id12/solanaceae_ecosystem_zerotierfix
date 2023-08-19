@@ -20,7 +20,7 @@ TransferAutoAccept::TransferAutoAccept(RegistryMessageModel& rmm, ConfigModelI& 
 	//}
 
 	if (!_conf.has_int("TransferAutoAccept", "autoaccept_limit")) {
-		_conf.set("TransferAutoAccept", "autoaccept_limit", 50l*1024l*1024l); // sane default
+		_conf.set("TransferAutoAccept", "autoaccept_limit", int64_t(50l*1024l*1024l)); // sane default
 	}
 }
 
