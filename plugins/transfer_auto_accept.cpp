@@ -1,6 +1,8 @@
 #include "./transfer_auto_accept.hpp"
 
 #include <solanaceae/message3/components.hpp>
+// for comp transfer tox filekind (TODO: generalize -> content system?)
+#include <solanaceae/tox_messages/components.hpp>
 
 #include <solanaceae/util/config_model.hpp>
 
@@ -34,7 +36,7 @@ void TransferAutoAccept::iterate(void) {
 			// TODO: contact to entry
 			_conf.get_string("TransferAutoAccept", "save_path").value_or("tmp_save_dir")
 		);
-		std::cout << "TAA: auto accpeted transfer\n";
+		std::cout << "TAA: auto accepted transfer\n";
 		_rmm.throwEventUpdate(it);
 	}
 	_accept_queue.clear();
@@ -46,6 +48,11 @@ void TransferAutoAccept::checkMsg(Message3Handle h) {
 	}
 
 	if (!h.all_of<Message::Components::Transfer::TagReceiving, Message::Components::Transfer::TagPaused, Message::Components::Transfer::FileInfo>()) {
+		return;
+	}
+
+	// dont touch avatars for now
+	if (h.all_of<Message::Components::Transfer::FileKind>() && h.get<Message::Components::Transfer::FileKind>().kind == 1) {
 		return;
 	}
 

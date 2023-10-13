@@ -45,4 +45,5 @@ target_link_libraries(plugin_transfer_auto_accept PUBLIC
 	solanaceae_plugin
 	solanaceae_util
 	solanaceae_message3
+	solanaceae_tox_messages # sad, for filekind
 )
