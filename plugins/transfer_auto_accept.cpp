@@ -34,7 +34,8 @@ void TransferAutoAccept::iterate(void) {
 
 		it.emplace<Message::Components::Transfer::ActionAccept>(
 			// TODO: contact to entry
-			_conf.get_string("TransferAutoAccept", "save_path").value_or("tmp_save_dir")
+			_conf.get_string("TransferAutoAccept", "save_path").value_or("tmp_save_dir"),
+			false
 		);
 		std::cout << "TAA: auto accepted transfer\n";
 		_rmm.throwEventUpdate(it);
