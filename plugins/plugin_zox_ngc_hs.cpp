@@ -1,7 +1,7 @@
 #include <solanaceae/plugin/solana_plugin_v1.h>
 
-#include <solanaceae/toxcore/tox_interface.hpp>
 #include <solanaceae/zox/ngc_hs.hpp>
+#include <solanaceae/toxcore/tox_interface.hpp>
 
 #include <memory>
 #include <iostream>
