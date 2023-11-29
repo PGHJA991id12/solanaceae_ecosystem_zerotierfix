@@ -16,3 +16,6 @@ add_subdirectory(./solanaceae_ngc_ft1)
 
 add_subdirectory(./solanaceae_zox)
 
+set(SOLANACEAE_TOXIC_GAMES_BUILD_PLUGINS ON)
+add_subdirectory(./solanaceae_toxic_games)
+

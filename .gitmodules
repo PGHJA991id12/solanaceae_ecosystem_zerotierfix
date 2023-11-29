@@ -29,3 +29,6 @@
 [submodule "external/solanaceae_ngc_ft1"]
 	path = external/solanaceae_ngc_ft1
 	url = https://github.com/Green-Sky/solanaceae_ngc_ft1.git
+[submodule "external/solanaceae_toxic_games"]
+	path = external/solanaceae_toxic_games
+	url = https://github.com/Green-Sky/solanaceae_toxic_games.git
