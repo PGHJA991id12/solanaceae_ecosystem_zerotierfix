@@ -71,14 +71,14 @@ void TransferAutoAccept::checkMsg(Message3Handle h) {
 }
 
 bool TransferAutoAccept::onEvent(const Message::Events::MessageConstruct& e) {
-	std::cout << "TAA: msg c\n";
+	//std::cout << "TAA: msg c\n";
 	checkMsg(e.e);
 
 	return false;
 }
 
 bool TransferAutoAccept::onEvent(const Message::Events::MessageUpdated& e) {
-	std::cout << "TAA: msg u\n";
+	//std::cout << "TAA: msg u\n";
 	checkMsg(e.e);
 
 	return false;
