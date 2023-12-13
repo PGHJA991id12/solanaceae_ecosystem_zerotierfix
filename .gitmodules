@@ -32,3 +32,6 @@
 [submodule "external/solanaceae_toxic_games"]
 	path = external/solanaceae_toxic_games
 	url = https://github.com/Green-Sky/solanaceae_toxic_games.git
+[submodule "external/solanaceae_ircclient"]
+	path = external/solanaceae_ircclient
+	url = https://github.com/Green-Sky/solanaceae_ircclient.git
