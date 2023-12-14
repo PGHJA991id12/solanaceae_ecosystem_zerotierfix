@@ -22,3 +22,5 @@ add_subdirectory(./solanaceae_toxic_games)
 set(SOLANACEAE_IRCCLIENT_BUILD_PLUGINS ON)
 add_subdirectory(./solanaceae_ircclient)
 
+add_subdirectory(./totato)
+

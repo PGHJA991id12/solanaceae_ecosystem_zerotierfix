@@ -35,3 +35,6 @@
 [submodule "external/solanaceae_ircclient"]
 	path = external/solanaceae_ircclient
 	url = https://github.com/Green-Sky/solanaceae_ircclient.git
+[submodule "external/totato"]
+	path = external/totato
+	url = https://github.com/Green-Sky/totato.git
