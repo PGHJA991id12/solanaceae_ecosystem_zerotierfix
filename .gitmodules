@@ -38,3 +38,6 @@
 [submodule "external/totato"]
 	path = external/totato
 	url = https://github.com/Green-Sky/totato.git
+[submodule "external/solanaceae_bridge"]
+	path = external/solanaceae_bridge
+	url = https://github.com/Green-Sky/solanaceae_bridge.git
