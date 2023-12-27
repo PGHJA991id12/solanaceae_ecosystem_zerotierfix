@@ -41,3 +41,6 @@
 [submodule "external/solanaceae_bridge"]
 	path = external/solanaceae_bridge
 	url = https://github.com/Green-Sky/solanaceae_bridge.git
+[submodule "external/solanaceae_crdtnotes"]
+	path = external/solanaceae_crdtnotes
+	url = https://github.com/Green-Sky/solanaceae_crdtnotes.git
