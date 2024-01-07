@@ -3,6 +3,7 @@
 #include <solanaceae/zox/ngc.hpp>
 
 #include <memory>
+#include <limits>
 #include <iostream>
 
 // fwd
@@ -57,9 +58,10 @@ SOLANA_PLUGIN_EXPORT void solana_plugin_stop(void) {
 	g_zngc.reset();
 }
 
-SOLANA_PLUGIN_EXPORT void solana_plugin_tick(float delta) {
+SOLANA_PLUGIN_EXPORT float solana_plugin_tick(float delta) {
 	(void)delta;
 	//std::cout << "PLUGIN ZNGC TICK()\n";
+	return std::numeric_limits<float>::max();
 }
 
 } // extern C

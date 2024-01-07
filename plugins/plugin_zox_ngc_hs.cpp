@@ -94,9 +94,11 @@ SOLANA_PLUGIN_EXPORT void solana_plugin_stop(void) {
 	g_zngchs.reset();
 }
 
-SOLANA_PLUGIN_EXPORT void solana_plugin_tick(float delta) {
+SOLANA_PLUGIN_EXPORT float solana_plugin_tick(float delta) {
 	//std::cout << "PLUGIN ZNGCHS TICK()\n";
 	g_zngchs->tick(delta);
+
+	return 0.1f; // TODO: use the actual timers
 }
 
 } // extern C

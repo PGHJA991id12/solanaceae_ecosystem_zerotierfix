@@ -96,11 +96,10 @@ SOLANA_PLUGIN_EXPORT void solana_plugin_stop(void) {
 	g_ngcextep.reset();
 }
 
-SOLANA_PLUGIN_EXPORT void solana_plugin_tick(float delta) {
-	//std::cout << "PLUGIN NGCEXT TICK()\n";
-
-	g_ngcft1->iterate(delta);
+SOLANA_PLUGIN_EXPORT float solana_plugin_tick(float delta) {
+	const float ft_interval = g_ngcft1->iterate(delta);
 	g_sha1_ngcft1->iterate(delta);
+	return ft_interval;
 }
 
 } // extern C
