@@ -7,18 +7,17 @@
 #include <memory>
 #include <iostream>
 
-#define RESOLVE_INSTANCE(x) static_cast<x*>(solana_api->resolveInstance(#x))
-#define PROVIDE_INSTANCE(x, p, v) solana_api->provideInstance(#x, p, static_cast<x*>(v))
-
 static std::unique_ptr<NGCEXTEventProvider> g_ngcextep = nullptr;
 // TODO: make sep plug
 static std::unique_ptr<NGCFT1> g_ngcft1 = nullptr;
 static std::unique_ptr<SHA1_NGCFT1> g_sha1_ngcft1 = nullptr;
 
+constexpr const char* plugin_name = "NGCEXT";
+
 extern "C" {
 
 SOLANA_PLUGIN_EXPORT const char* solana_plugin_get_name(void) {
-	return "NGCEXT";
+	return plugin_name;
 }
 
 SOLANA_PLUGIN_EXPORT uint32_t solana_plugin_get_version(void) {
@@ -26,70 +25,42 @@ SOLANA_PLUGIN_EXPORT uint32_t solana_plugin_get_version(void) {
 }
 
 SOLANA_PLUGIN_EXPORT uint32_t solana_plugin_start(struct SolanaAPI* solana_api) {
-	std::cout << "PLUGIN NGCEXT START()\n";
+	std::cout << "PLUGIN " << plugin_name << " START()\n";
 
 	if (solana_api == nullptr) {
 		return 1;
 	}
 
-	ToxI* tox_i = nullptr;
-	ToxEventProviderI* tox_event_provider_i = nullptr;
-	Contact3Registry* cr = nullptr;
-	RegistryMessageModel* rmm = nullptr;
-	ToxContactModel2* tcm = nullptr;
+	try {
+		auto* tox_i = PLUG_RESOLVE_INSTANCE(ToxI);
+		auto* tox_event_provider_i = PLUG_RESOLVE_INSTANCE(ToxEventProviderI);
+		auto* cr = PLUG_RESOLVE_INSTANCE_VERSIONED(Contact3Registry, "1");
+		auto* rmm = PLUG_RESOLVE_INSTANCE(RegistryMessageModel);
+		auto* tcm = PLUG_RESOLVE_INSTANCE(ToxContactModel2);
 
-	{ // make sure required types are loaded
-		tox_i = RESOLVE_INSTANCE(ToxI);
-		tox_event_provider_i = RESOLVE_INSTANCE(ToxEventProviderI);
-		cr = RESOLVE_INSTANCE(Contact3Registry);
-		rmm = RESOLVE_INSTANCE(RegistryMessageModel);
-		tcm = RESOLVE_INSTANCE(ToxContactModel2);
+		// static store, could be anywhere tho
+		// construct with fetched dependencies
+		g_ngcextep = std::make_unique<NGCEXTEventProvider>(*tox_event_provider_i);
+		g_ngcft1 = std::make_unique<NGCFT1>(*tox_i, *tox_event_provider_i, *g_ngcextep.get());
+		g_sha1_ngcft1 = std::make_unique<SHA1_NGCFT1>(*cr, *rmm, *g_ngcft1.get(), *tcm);
 
-		if (tox_i == nullptr) {
-			std::cerr << "PLUGIN NGCEXT missing ToxI\n";
-			return 2;
-		}
+		// register types
+		PLUG_PROVIDE_INSTANCE(NGCEXTEventProviderI, plugin_name, g_ngcextep.get());
 
-		if (tox_event_provider_i == nullptr) {
-			std::cerr << "PLUGIN NGCEXT missing ToxEventProviderI\n";
-			return 2;
-		}
+		PLUG_PROVIDE_INSTANCE(NGCFT1EventProviderI, plugin_name, g_ngcft1.get());
+		PLUG_PROVIDE_INSTANCE(NGCFT1, plugin_name, g_ngcft1.get());
 
-		if (cr == nullptr) {
-			std::cerr << "PLUGIN NGCEXT missing Contact3Registry\n";
-			return 2;
-		}
-
-		if (rmm == nullptr) {
-			std::cerr << "PLUGIN NGCEXT missing RegistryMessageModel\n";
-			return 2;
-		}
-
-		if (tcm == nullptr) {
-			std::cerr << "PLUGIN NGCEXT missing ToxContactModel2\n";
-			return 2;
-		}
+		PLUG_PROVIDE_INSTANCE(SHA1_NGCFT1, plugin_name, g_sha1_ngcft1.get());
+	} catch (const ResolveException& e) {
+		std::cerr << "PLUGIN " << plugin_name << " " << e.what << "\n";
+		return 2;
 	}
-
-	// static store, could be anywhere tho
-	// construct with fetched dependencies
-	g_ngcextep = std::make_unique<NGCEXTEventProvider>(*tox_event_provider_i);
-	g_ngcft1 = std::make_unique<NGCFT1>(*tox_i, *tox_event_provider_i, *g_ngcextep.get());
-	g_sha1_ngcft1 = std::make_unique<SHA1_NGCFT1>(*cr, *rmm, *g_ngcft1.get(), *tcm);
-
-	// register types
-	PROVIDE_INSTANCE(NGCEXTEventProviderI, "NGCEXT", g_ngcextep.get());
-
-	PROVIDE_INSTANCE(NGCFT1EventProviderI, "NGCEXT", g_ngcft1.get());
-	PROVIDE_INSTANCE(NGCFT1, "NGCEXT", g_ngcft1.get());
-
-	PROVIDE_INSTANCE(SHA1_NGCFT1, "NGCEXT", g_sha1_ngcft1.get());
 
 	return 0;
 }
 
 SOLANA_PLUGIN_EXPORT void solana_plugin_stop(void) {
-	std::cout << "PLUGIN NGCEXT STOP()\n";
+	std::cout << "PLUGIN " << plugin_name << " STOP()\n";
 
 	g_sha1_ngcft1.reset();
 	g_ngcft1.reset();
