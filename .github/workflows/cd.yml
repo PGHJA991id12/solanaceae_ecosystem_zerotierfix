@@ -37,18 +37,24 @@ jobs:
       run: |
         SHORT_HASH="$(git rev-parse --short=7 HEAD)"
         if [[ "${{ env.BRANCH_NAME }}" == "master" ]]; then
-          echo "name=b${SHORT_HASH}" >> $GITHUB_OUTPUT
+          echo "name=${SHORT_HASH}" >> $GITHUB_OUTPUT
         else
           SAFE_NAME=$(echo "${{ env.BRANCH_NAME }}" | tr '/' '-')
           echo "name=${SAFE_NAME}-${SHORT_HASH}" >> $GITHUB_OUTPUT
         fi
 
-    - uses: actions/upload-artifact@v3
+    - name: Compress artifacts
+      shell: bash
+      run: |
+        tar -czvf ${{ github.event.repository.name }}-${{ steps.tag.outputs.name }}-${{ runner.os }}-ubuntu20.04-x86_64.tar.gz -C ${{github.workspace}}/build/bin/ .
+
+    - uses: actions/upload-artifact@v4
       with:
+        # TODO: simpler name?
         name: ${{ github.event.repository.name }}-${{ steps.tag.outputs.name }}-${{ runner.os }}-ubuntu20.04-x86_64
         # TODO: do propper packing
         path: |
-          ${{github.workspace}}/build/bin/
+          ${{github.workspace}}/${{ github.event.repository.name }}-${{ steps.tag.outputs.name }}-${{ runner.os }}-ubuntu20.04-x86_64.tar.gz
 
 
   windows:
@@ -82,18 +88,24 @@ jobs:
       run: |
         SHORT_HASH="$(git rev-parse --short=7 HEAD)"
         if [[ "${{ env.BRANCH_NAME }}" == "master" ]]; then
-          echo "name=b${SHORT_HASH}" >> $GITHUB_OUTPUT
+          echo "name=${SHORT_HASH}" >> $GITHUB_OUTPUT
         else
           SAFE_NAME=$(echo "${{ env.BRANCH_NAME }}" | tr '/' '-')
           echo "name=${SAFE_NAME}-${SHORT_HASH}" >> $GITHUB_OUTPUT
         fi
 
-    - uses: actions/upload-artifact@v3
+    - name: Compress artifacts
+      shell: powershell
+      run: |
+        Compress-Archive -Path ${{github.workspace}}/build/bin/* -Destination ${{ github.event.repository.name }}-${{ steps.tag.outputs.name }}-${{ runner.os }}-msvc-x86_64.zip
+
+    - uses: actions/upload-artifact@v4
       with:
+        # TODO: simpler name?
         name: ${{ github.event.repository.name }}-${{ steps.tag.outputs.name }}-${{ runner.os }}-msvc-x86_64
         # TODO: do propper packing
         path: |
-          ${{github.workspace}}/build/bin/
+          ${{github.workspace}}/${{ github.event.repository.name }}-${{ steps.tag.outputs.name }}-${{ runner.os }}-msvc-x86_64.zip
 
   release:
     if: ${{ ( github.event_name == 'push' && github.ref == 'refs/heads/master' ) }}
@@ -119,7 +131,7 @@ jobs:
       run: |
         SHORT_HASH="$(git rev-parse --short=7 HEAD)"
         if [[ "${{ env.BRANCH_NAME }}" == "master" ]]; then
-          echo "name=b${SHORT_HASH}" >> $GITHUB_OUTPUT
+          echo "name=${SHORT_HASH}" >> $GITHUB_OUTPUT
         else
           SAFE_NAME=$(echo "${{ env.BRANCH_NAME }}" | tr '/' '-')
           echo "name=${SAFE_NAME}-${SHORT_HASH}" >> $GITHUB_OUTPUT
@@ -127,7 +139,9 @@ jobs:
 
     - name: Download artifacts
       id: download-artifact
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
+      with:
+        path: ./artifacts/
 
     - name: Create release
       env:
@@ -137,8 +151,8 @@ jobs:
       run: |
         gh release create "$tag" \
             --repo="$GITHUB_REPOSITORY" \
-            --title="${GITHUB_REPOSITORY#*/} ${tag#v} nightly" \
-            --generate-notes \
+            --title="nightly ${tag#v}" \
+            --notes="nightly build" \
             --prerelease
 
     - name: Upload artifacts
@@ -147,5 +161,6 @@ jobs:
         tag: ${{ steps.tag.outputs.name }}
       shell: bash
       run: |
-        gh release upload "$tag" ./artifact \
+        ls -laR ./artifacts
+        gh release upload "$tag" ./artifacts/*/* \
             --repo="$GITHUB_REPOSITORY"
