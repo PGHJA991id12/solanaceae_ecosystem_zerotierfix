@@ -1,5 +1,6 @@
 #include <solanaceae/plugin/solana_plugin_v1.h>
 
+#include <solanaceae/zox/ngc.hpp>
 #include <solanaceae/zox/ngc_hs.hpp>
 #include <solanaceae/toxcore/tox_interface.hpp>
 #include <solanaceae/tox_contacts/tox_contact_model2.hpp>
