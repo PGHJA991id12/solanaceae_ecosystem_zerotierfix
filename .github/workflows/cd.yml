@@ -8,6 +8,7 @@ on:
 
 env:
   BUILD_TYPE: Release
+  BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
 
 jobs:
   linux-ubuntu:
@@ -29,9 +30,22 @@ jobs:
     - name: Build
       run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}} -j 4
 
+    - name: Determine tag name
+      id: tag
+      shell: bash
+      # taken from llama.cpp
+      run: |
+        SHORT_HASH="$(git rev-parse --short=7 HEAD)"
+        if [[ "${{ env.BRANCH_NAME }}" == "master" ]]; then
+          echo "name=b${SHORT_HASH}" >> $GITHUB_OUTPUT
+        else
+          SAFE_NAME=$(echo "${{ env.BRANCH_NAME }}" | tr '/' '-')
+          echo "name=${SAFE_NAME}-${SHORT_HASH}" >> $GITHUB_OUTPUT
+        fi
+
     - uses: actions/upload-artifact@v3
       with:
-        name: ${{ github.event.repository.name }}-ubuntu20.04-x86_64
+        name: ${{ github.event.repository.name }}-${{ steps.tag.outputs.name }}-${{ runner.os }}-ubuntu20.04-x86_64
         # TODO: do propper packing
         path: |
           ${{github.workspace}}/build/bin/
@@ -59,12 +73,79 @@ jobs:
       run: cmake -G Ninja -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake -DVCPKG_TARGET_TRIPLET=x64-windows-static
 
     - name: Build
-      run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}} -j 4
+      run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
+
+    - name: Determine tag name
+      id: tag
+      shell: bash
+      # taken from llama.cpp
+      run: |
+        SHORT_HASH="$(git rev-parse --short=7 HEAD)"
+        if [[ "${{ env.BRANCH_NAME }}" == "master" ]]; then
+          echo "name=b${SHORT_HASH}" >> $GITHUB_OUTPUT
+        else
+          SAFE_NAME=$(echo "${{ env.BRANCH_NAME }}" | tr '/' '-')
+          echo "name=${SAFE_NAME}-${SHORT_HASH}" >> $GITHUB_OUTPUT
+        fi
 
     - uses: actions/upload-artifact@v3
       with:
-        name: ${{ github.event.repository.name }}-windows-msvc-x86_64
+        name: ${{ github.event.repository.name }}-${{ steps.tag.outputs.name }}-${{ runner.os }}-msvc-x86_64
         # TODO: do propper packing
         path: |
           ${{github.workspace}}/build/bin/
 
+  release:
+    if: ${{ ( github.event_name == 'push' && github.ref == 'refs/heads/master' ) }}
+
+    runs-on: ubuntu-latest
+
+    needs:
+      - linux-ubuntu
+      - windows
+
+    permissions:
+      contents: write
+
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        submodules: recursive
+
+    - name: Determine tag name
+      id: tag
+      shell: bash
+      # taken from llama.cpp
+      run: |
+        SHORT_HASH="$(git rev-parse --short=7 HEAD)"
+        if [[ "${{ env.BRANCH_NAME }}" == "master" ]]; then
+          echo "name=b${SHORT_HASH}" >> $GITHUB_OUTPUT
+        else
+          SAFE_NAME=$(echo "${{ env.BRANCH_NAME }}" | tr '/' '-')
+          echo "name=${SAFE_NAME}-${SHORT_HASH}" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Download artifacts
+      id: download-artifact
+      uses: actions/download-artifact@v3
+
+    - name: Create release
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        tag: ${{ steps.tag.outputs.name }}
+      shell: bash
+      run: |
+        gh release create "$tag" \
+            --repo="$GITHUB_REPOSITORY" \
+            --title="${GITHUB_REPOSITORY#*/} ${tag#v} nightly" \
+            --generate-notes \
+            --prerelease
+
+    - name: Upload artifacts
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        tag: ${{ steps.tag.outputs.name }}
+      shell: bash
+      run: |
+        gh release upload "$tag" ./artifact \
+            --repo="$GITHUB_REPOSITORY"
