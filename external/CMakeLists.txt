@@ -28,5 +28,8 @@ add_subdirectory(./solanaceae_ircclient)
 set(SOLANACEAE_CRDTNOTES_BUILD_PLUGINS ON)
 add_subdirectory(./solanaceae_crdtnotes)
 
+set(SOLANACEAE_LLAMA-CPP-WEB_BUILD_PLUGINS ON)
+add_subdirectory(./solanaceae_llama-cpp-web)
+
 add_subdirectory(./totato)
 

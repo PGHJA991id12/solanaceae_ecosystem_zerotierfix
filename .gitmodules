@@ -44,3 +44,6 @@
 [submodule "external/solanaceae_crdtnotes"]
 	path = external/solanaceae_crdtnotes
 	url = https://github.com/Green-Sky/solanaceae_crdtnotes.git
+[submodule "external/solanaceae_llama-cpp-web"]
+	path = external/solanaceae_llama-cpp-web
+	url = https://github.com/Green-Sky/solanaceae_llama-cpp-web.git
