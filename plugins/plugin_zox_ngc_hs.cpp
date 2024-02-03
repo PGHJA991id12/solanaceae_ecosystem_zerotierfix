@@ -58,9 +58,7 @@ SOLANA_PLUGIN_EXPORT void solana_plugin_stop(void) {
 }
 
 SOLANA_PLUGIN_EXPORT float solana_plugin_tick(float delta) {
-	g_zngchs->tick(delta);
-
-	return 0.1f; // TODO: use the actual timers
+	return g_zngchs->tick(delta);
 }
 
 } // extern C
