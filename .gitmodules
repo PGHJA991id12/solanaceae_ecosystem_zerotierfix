@@ -47,3 +47,6 @@
 [submodule "external/solanaceae_llama-cpp-web"]
 	path = external/solanaceae_llama-cpp-web
 	url = https://github.com/Green-Sky/solanaceae_llama-cpp-web.git
+[submodule "external/solanaceae_tox_upnp"]
+	path = external/solanaceae_tox_upnp
+	url = https://github.com/Green-Sky/solanaceae_tox_upnp

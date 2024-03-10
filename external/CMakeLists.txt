@@ -15,6 +15,9 @@ add_subdirectory(./toxcore)
 add_subdirectory(./solanaceae_toxcore)
 add_subdirectory(./solanaceae_tox)
 
+set(SOLANACEAE_TOX_UPNP_BUILD_PLUGINS ON)
+add_subdirectory(./solanaceae_tox_upnp)
+
 add_subdirectory(./solanaceae_ngc_ft1)
 
 set(SOLANACEAE_ZOX_BUILD_PLUGINS ON)
