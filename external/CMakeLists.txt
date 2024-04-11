@@ -11,6 +11,8 @@ add_subdirectory(./solanaceae_message3)
 set(SOLANACEAE_BRIDGE_BUILD_PLUGINS ON)
 add_subdirectory(./solanaceae_bridge)
 
+add_subdirectory(./solanaceae_object_store)
+
 add_subdirectory(./toxcore)
 add_subdirectory(./solanaceae_toxcore)
 add_subdirectory(./solanaceae_tox)

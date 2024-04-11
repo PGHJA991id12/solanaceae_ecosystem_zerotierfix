@@ -50,3 +50,6 @@
 [submodule "external/solanaceae_tox_upnp"]
 	path = external/solanaceae_tox_upnp
 	url = https://github.com/Green-Sky/solanaceae_tox_upnp
+[submodule "external/solanaceae_object_store"]
+	path = external/solanaceae_object_store
+	url = https://github.com/Green-Sky/solanaceae_object_store.git
