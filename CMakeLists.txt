@@ -18,6 +18,12 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 
+option(SOLANACEAE_ECOSYSTEM_BUILD_TESTING "Build tests" ${BUILD_TESTING})
+
+if (SOLANACEAE_ECOSYSTEM_BUILD_TESTING)
+	include(CTest)
+endif()
+
 # external libs
 add_subdirectory(./external) # before increasing warn levels, sad :(
 
