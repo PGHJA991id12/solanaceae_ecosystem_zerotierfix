@@ -11,6 +11,7 @@ add_subdirectory(./solanaceae_message3)
 set(SOLANACEAE_BRIDGE_BUILD_PLUGINS ON)
 add_subdirectory(./solanaceae_bridge)
 
+set(SOLANACEAE_OBJECT_STORE_BUILD_TESTING ${SOLANACEAE_ECOSYSTEM_BUILD_TESTING})
 add_subdirectory(./solanaceae_object_store)
 
 add_subdirectory(./toxcore)
