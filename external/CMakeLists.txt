@@ -14,6 +14,10 @@ add_subdirectory(./solanaceae_bridge)
 set(SOLANACEAE_OBJECT_STORE_BUILD_TESTING ${SOLANACEAE_ECOSYSTEM_BUILD_TESTING})
 add_subdirectory(./solanaceae_object_store)
 
+add_subdirectory(./solanaceae_message_serializer)
+set(SOLANACEAE_MESSAGE_FRAGMENT_STORE_BUILD_PLUGINS ON)
+add_subdirectory(./solanaceae_message_fragment_store)
+
 add_subdirectory(./toxcore)
 add_subdirectory(./solanaceae_toxcore)
 add_subdirectory(./solanaceae_tox)
