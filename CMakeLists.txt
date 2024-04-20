@@ -25,6 +25,9 @@ if (SOLANACEAE_ECOSYSTEM_BUILD_TESTING)
 	include(CTest)
 endif()
 
+#add_compile_options(-fsanitize=undefined)
+#link_libraries(-fsanitize=undefined)
+
 # external libs
 add_subdirectory(./external) # before increasing warn levels, sad :(
 
