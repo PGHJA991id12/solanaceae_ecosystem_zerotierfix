@@ -4,6 +4,9 @@
 #include <solanaceae/ngc_ft1/ngcft1.hpp>
 #include <solanaceae/ngc_ft1_sha1/sha1_ngcft1.hpp>
 
+#include <entt/entt.hpp>
+#include <entt/fwd.hpp>
+
 #include <memory>
 #include <iostream>
 

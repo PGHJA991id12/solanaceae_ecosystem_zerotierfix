@@ -3,6 +3,9 @@
 #include "./transfer_auto_accept.hpp"
 #include <solanaceae/util/config_model.hpp>
 
+#include <entt/entt.hpp>
+#include <entt/fwd.hpp>
+
 #include <memory>
 #include <limits>
 #include <iostream>
