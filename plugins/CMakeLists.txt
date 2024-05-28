@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.9 FATAL_ERROR)
 
-add_library(plugin_ngcft1 SHARED
+add_library(plugin_ngcft1 MODULE
 	./plugin_ngcft1.cpp
 )
 set_target_properties(plugin_ngcft1 PROPERTIES
@@ -19,14 +19,13 @@ target_link_libraries(plugin_ngcft1 PUBLIC
 
 ########################################
 
-add_library(plugin_transfer_auto_accept SHARED
+add_library(plugin_transfer_auto_accept MODULE
 	./plugin_transfer_auto_accept.cpp
 	./transfer_auto_accept.hpp
 	./transfer_auto_accept.cpp
 )
 set_target_properties(plugin_transfer_auto_accept PROPERTIES
 	C_VISIBILITY_PRESET hidden
-	POSITION_INDEPENDENT_CODE ON
 )
 target_compile_definitions(plugin_transfer_auto_accept PUBLIC ENTT_API_IMPORT)
 
