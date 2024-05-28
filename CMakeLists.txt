@@ -18,19 +18,12 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 
-option(SOLANACEAE_ECOSYSTEM_BUILD_PLUGINS "Build plugins and not hosts (totato)" ON)
 option(SOLANACEAE_ECOSYSTEM_BUILD_TESTING "Build tests" ${BUILD_TESTING})
 message("II SOLANACEAE_ECOSYSTEM_BUILD_TESTING " ${SOLANACEAE_ECOSYSTEM_BUILD_TESTING})
 
-if (SOLANACEAE_ECOSYSTEM_BUILD_PLUGINS)
-	# uggly, but it needs to be defined for all dependencies too
-	# but this also means that we can not compile a host in the same cmake run as plugins
-	#add_compile_definitions(ENTT_API_IMPORT)
-	# what if its always export?
-	add_compile_definitions(ENTT_API_EXPORT)
-else()
-	add_compile_definitions(ENTT_API_EXPORT)
-endif()
+# uggly, but it needs to be defined for all dependencies too
+# what if its always export?
+add_compile_definitions(ENTT_API_EXPORT)
 
 if (SOLANACEAE_ECOSYSTEM_BUILD_TESTING)
 	include(CTest)
@@ -69,7 +62,4 @@ endif()
 
 # cmake setup end
 
-if (SOLANACEAE_ECOSYSTEM_BUILD_PLUGINS)
-	add_subdirectory(./plugins)
-endif()
-
+add_subdirectory(./plugins)
