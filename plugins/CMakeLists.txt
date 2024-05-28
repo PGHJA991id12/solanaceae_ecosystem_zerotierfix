@@ -6,7 +6,6 @@ add_library(plugin_ngcft1 MODULE
 set_target_properties(plugin_ngcft1 PROPERTIES
 	C_VISIBILITY_PRESET hidden
 	VISIBILITY_INLINES_HIDDEN ON # do we need this?
-	POSITION_INDEPENDENT_CODE ON
 )
 target_compile_definitions(plugin_ngcft1 PUBLIC ENTT_API_IMPORT)
 
