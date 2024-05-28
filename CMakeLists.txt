@@ -25,7 +25,9 @@ message("II SOLANACEAE_ECOSYSTEM_BUILD_TESTING " ${SOLANACEAE_ECOSYSTEM_BUILD_TE
 if (SOLANACEAE_ECOSYSTEM_BUILD_PLUGINS)
 	# uggly, but it needs to be defined for all dependencies too
 	# but this also means that we can not compile a host in the same cmake run as plugins
-	add_compile_definitions(ENTT_API_IMPORT)
+	#add_compile_definitions(ENTT_API_IMPORT)
+	# what if its always export?
+	add_compile_definitions(ENTT_API_EXPORT)
 else()
 	add_compile_definitions(ENTT_API_EXPORT)
 endif()
@@ -67,5 +69,7 @@ endif()
 
 # cmake setup end
 
-add_subdirectory(./plugins)
+if (SOLANACEAE_ECOSYSTEM_BUILD_PLUGINS)
+	add_subdirectory(./plugins)
+endif()
 
