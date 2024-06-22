@@ -46,7 +46,7 @@ SOLANA_PLUGIN_EXPORT uint32_t solana_plugin_start(struct SolanaAPI* solana_api) 
 		// construct with fetched dependencies
 		g_ngcextep = std::make_unique<NGCEXTEventProvider>(*tox_event_provider_i);
 		g_ngcft1 = std::make_unique<NGCFT1>(*tox_i, *tox_event_provider_i, *g_ngcextep.get());
-		g_sha1_ngcft1 = std::make_unique<SHA1_NGCFT1>(*os, *cr, *rmm, *g_ngcft1.get(), *tcm, *tox_event_provider_i);
+		g_sha1_ngcft1 = std::make_unique<SHA1_NGCFT1>(*os, *cr, *rmm, *g_ngcft1.get(), *tcm, *tox_event_provider_i, *g_ngcextep.get());
 
 		// register types
 		PLUG_PROVIDE_INSTANCE(NGCEXTEventProviderI, plugin_name, g_ngcextep.get());
