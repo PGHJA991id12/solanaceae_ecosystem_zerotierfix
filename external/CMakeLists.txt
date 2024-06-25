@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.9 FATAL_ERROR)
 
+set(SOLANACEAE_UTIL_BUILD_TESTING ${SOLANACEAE_ECOSYSTEM_BUILD_TESTING})
 add_subdirectory(./solanaceae_util)
 add_subdirectory(./solanaceae_plugin)
 
@@ -11,7 +12,7 @@ add_subdirectory(./solanaceae_message3)
 set(SOLANACEAE_BRIDGE_BUILD_PLUGINS ON)
 add_subdirectory(./solanaceae_bridge)
 
-set(SOLANACEAE_OBJECT_STORE_BUILD_TESTING ON)
+set(SOLANACEAE_OBJECT_STORE_BUILD_TESTING ${SOLANACEAE_ECOSYSTEM_BUILD_TESTING})
 add_subdirectory(./solanaceae_object_store)
 
 add_subdirectory(./solanaceae_message_serializer)
@@ -25,6 +26,7 @@ add_subdirectory(./solanaceae_tox)
 set(SOLANACEAE_TOX_UPNP_BUILD_PLUGINS ON)
 add_subdirectory(./solanaceae_tox_upnp)
 
+set(SOLANACEAE_NGCFT1_SHA1_BUILD_TESTING ${SOLANACEAE_ECOSYSTEM_BUILD_TESTING})
 add_subdirectory(./solanaceae_ngc_ft1)
 
 set(SOLANACEAE_ZOX_BUILD_PLUGINS ON)
