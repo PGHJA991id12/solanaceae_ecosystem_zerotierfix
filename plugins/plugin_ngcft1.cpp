@@ -73,8 +73,8 @@ SOLANA_PLUGIN_EXPORT void solana_plugin_stop(void) {
 
 SOLANA_PLUGIN_EXPORT float solana_plugin_tick(float delta) {
 	const float ft_interval = g_ngcft1->iterate(delta);
-	g_sha1_ngcft1->iterate(delta);
-	return ft_interval;
+	const float sha_interval = g_sha1_ngcft1->iterate(delta);
+	return std::min<float>(ft_interval, sha_interval);
 }
 
 } // extern C
