@@ -7,7 +7,7 @@ on:
     branches: [ master ]
 
 env:
-  BUILD_TYPE: Release
+  BUILD_TYPE: RelWithDebInfo
   BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
 
 jobs:
