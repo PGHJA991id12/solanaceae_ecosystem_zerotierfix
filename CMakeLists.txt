@@ -58,6 +58,9 @@ elseif (${CMAKE_CXX_COMPILER_ID} STREQUAL "MSVC")
 	else()
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4")
 	endif()
+
+	# remove unreferenced objects, significantly reducing binary and debugsymbol sizes
+	add_link_options("/OPT:REF")
 endif()
 
 # cmake setup end
