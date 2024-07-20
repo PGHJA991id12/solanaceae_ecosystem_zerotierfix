@@ -6,14 +6,14 @@ add_subdirectory(./solanaceae_plugin)
 
 add_subdirectory(./entt)
 
+set(SOLANACEAE_OBJECT_STORE_BUILD_TESTING ${SOLANACEAE_ECOSYSTEM_BUILD_TESTING} CACHE BOOL "")
+add_subdirectory(./solanaceae_object_store)
+
 add_subdirectory(./solanaceae_contact)
 add_subdirectory(./solanaceae_message3)
 
 set(SOLANACEAE_BRIDGE_BUILD_PLUGINS ON CACHE BOOL "")
 add_subdirectory(./solanaceae_bridge)
-
-set(SOLANACEAE_OBJECT_STORE_BUILD_TESTING ${SOLANACEAE_ECOSYSTEM_BUILD_TESTING} CACHE BOOL "")
-add_subdirectory(./solanaceae_object_store)
 
 add_subdirectory(./solanaceae_message_serializer)
 set(SOLANACEAE_MESSAGE_FRAGMENT_STORE_BUILD_PLUGINS ON CACHE BOOL "")
