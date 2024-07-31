@@ -32,12 +32,13 @@ SOLANA_PLUGIN_EXPORT uint32_t solana_plugin_start(struct SolanaAPI* solana_api) 
 	}
 
 	try {
+		auto* os = PLUG_RESOLVE_INSTANCE(ObjectStore2);
 		auto* rmm = PLUG_RESOLVE_INSTANCE(RegistryMessageModel);
 		auto* conf = PLUG_RESOLVE_INSTANCE(ConfigModelI);
 
 		// static store, could be anywhere tho
 		// construct with fetched dependencies
-		g_taa = std::make_unique<TransferAutoAccept>(*rmm, *conf);
+		g_taa = std::make_unique<TransferAutoAccept>(*os, *rmm, *conf);
 
 		// register types
 		PLUG_PROVIDE_INSTANCE(TransferAutoAccept, plugin_name, g_taa.get());

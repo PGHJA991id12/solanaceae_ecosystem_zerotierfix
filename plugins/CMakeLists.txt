@@ -31,6 +31,7 @@ target_compile_definitions(plugin_transfer_auto_accept PUBLIC ENTT_API_IMPORT)
 target_link_libraries(plugin_transfer_auto_accept PUBLIC
 	solanaceae_plugin
 	solanaceae_util
+	solanaceae_object_store
 	solanaceae_message3
 	solanaceae_tox_messages # sad, for filekind
 )

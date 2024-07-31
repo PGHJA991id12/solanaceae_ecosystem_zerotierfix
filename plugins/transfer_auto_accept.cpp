@@ -1,14 +1,18 @@
 #include "./transfer_auto_accept.hpp"
 
+#include <solanaceae/object_store/meta_components_file.hpp>
+
 #include <solanaceae/message3/components.hpp>
 // for comp transfer tox filekind (TODO: generalize -> content system?)
-#include <solanaceae/tox_messages/components.hpp>
+#include <solanaceae/tox_messages/obj_components.hpp>
 
 #include <solanaceae/util/config_model.hpp>
 
 #include <iostream>
 
-TransferAutoAccept::TransferAutoAccept(RegistryMessageModel& rmm, ConfigModelI& conf) : _rmm(rmm), _conf(conf) {
+TransferAutoAccept::TransferAutoAccept(ObjectStore2& os, RegistryMessageModel& rmm, ConfigModelI& conf) : _os(os), _rmm(rmm), _conf(conf) {
+	//_os.subscribe(this, ObjectStore_Event::object_update);
+
 	_rmm.subscribe(this, RegistryMessageModel_Event::message_construct);
 	_rmm.subscribe(this, RegistryMessageModel_Event::message_updated);
 
@@ -28,59 +32,90 @@ TransferAutoAccept::TransferAutoAccept(RegistryMessageModel& rmm, ConfigModelI& 
 
 void TransferAutoAccept::iterate(void) {
 	for (auto& it : _accept_queue) {
-		if (it.all_of<Message::Components::Transfer::ActionAccept>()) {
+		if (it.all_of<ObjComp::Ephemeral::File::ActionTransferAccept>()) {
 			continue; // already accepted
 		}
 
-		it.emplace<Message::Components::Transfer::ActionAccept>(
+		it.emplace<ObjComp::Ephemeral::File::ActionTransferAccept>(
 			// TODO: contact to entry
 			_conf.get_string("TransferAutoAccept", "save_path").value_or("tmp_save_dir"),
 			false
 		);
 		std::cout << "TAA: auto accepted transfer\n";
-		_rmm.throwEventUpdate(it);
+		_os.throwEventUpdate(it);
+		//_rmm.throwEventUpdate(it);
 	}
 	_accept_queue.clear();
 }
 
-void TransferAutoAccept::checkMsg(Message3Handle h) {
-	if (h.all_of<Message::Components::Transfer::ActionAccept>()) {
+void TransferAutoAccept::checkObj(ObjectHandle o) {
+	if (o.all_of<ObjComp::Ephemeral::File::ActionTransferAccept>()) {
 		return; // already accepted
 	}
 
-	if (!h.all_of<Message::Components::Transfer::TagReceiving, Message::Components::Transfer::TagPaused, Message::Components::Transfer::FileInfo>()) {
+	if (o.all_of<ObjComp::F::TagLocalHaveAll>()) {
+		return; // alreay have
+	}
+
+	//if (!h.all_of<Message::Components::Transfer::TagReceiving, Message::Components::Transfer::TagPaused, Message::Components::Transfer::FileInfo>()) {
+	// TODO: tag receiving ??
+	if (!o.all_of</*Message::Components::Transfer::TagReceiving, */ObjComp::Ephemeral::File::TagTransferPaused>()) {
 		return;
+	}
+
+	if (!o.any_of<ObjComp::F::SingleInfo, ObjComp::F::CollectionInfo>()) {
+		return; // dont know enough
 	}
 
 	// dont touch avatars for now
-	if (h.all_of<Message::Components::Transfer::FileKind>() && h.get<Message::Components::Transfer::FileKind>().kind == 1) {
+	// TODO: more generic file types??
+	if (const auto* fk = o.try_get<ObjComp::Tox::FileKind>(); fk != nullptr && fk->kind != 0) {
 		return;
 	}
 
-	const auto& file_info = h.get<Message::Components::Transfer::FileInfo>();
+	uint64_t total_size {0u};
+	if (const auto* si = o.try_get<ObjComp::F::SingleInfo>(); si != nullptr) {
+		if (si->file_name.empty()) {
+			return; // bad file
+		}
+		total_size = si->file_size;
+	} else if (const auto* ci = o.try_get<ObjComp::F::CollectionInfo>(); ci != nullptr) {
+		if (ci->file_list.empty() || ci->file_list.front().file_name.empty()) {
+			return; // bad file
+		}
+		total_size = ci->total_size;
+	}
+
+	//const auto& file_info = h.get<Message::Components::Transfer::FileInfo>();
 	// TODO: contact to entry
-	if (file_info.total_size > uint64_t(_conf.get_int("TransferAutoAccept", "autoaccept_limit").value_or(1024*1024))) {
+	if (total_size > uint64_t(_conf.get_int("TransferAutoAccept", "autoaccept_limit").value_or(1024*1024))) {
 		return; // too large
 	}
 
-	if (file_info.file_list.empty() || file_info.file_list.front().file_name.empty()) {
-		return; // bad file
+	_accept_queue.push_back(o);
+}
+
+void TransferAutoAccept::checkMsg(Message3Handle h) {
+	if (!h.all_of<Message::Components::MessageFileObject>()) {
+		return;
 	}
 
-	_accept_queue.push_back(h);
+	checkObj(h.get<Message::Components::MessageFileObject>().o);
 }
 
 bool TransferAutoAccept::onEvent(const Message::Events::MessageConstruct& e) {
-	//std::cout << "TAA: msg c\n";
 	checkMsg(e.e);
-
 	return false;
 }
 
 bool TransferAutoAccept::onEvent(const Message::Events::MessageUpdated& e) {
-	//std::cout << "TAA: msg u\n";
 	checkMsg(e.e);
+	return false;
+}
 
+bool TransferAutoAccept::onEvent(const ObjectStore::Events::ObjectUpdate&) {
+	// too expensive rn
+	//checkObj(e.e);
 	return false;
 }
 
