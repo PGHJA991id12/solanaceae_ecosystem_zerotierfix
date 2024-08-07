@@ -12,9 +12,11 @@ class DiceTool : public P2PRNGEventI {
 	struct Rolls {
 		std::vector<uint8_t> id;
 
+		uint16_t sides {};
+
 		P2PRNG::State state {P2PRNG::State::UNKNOWN};
-		uint16_t state_number_1{};
-		uint16_t state_number_2{};
+		uint16_t state_number_1 {};
+		uint16_t state_number_2 {};
 
 		uint16_t final_result{};
 	};

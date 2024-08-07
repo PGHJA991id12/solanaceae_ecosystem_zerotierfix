@@ -119,44 +119,120 @@ float DiceTool::render(float) {
 				c_vec.emplace_back(_cr, cv);
 			}
 
-			auto new_id = _p2prng.newGernationPeers(c_vec, ByteSpan{reinterpret_cast<uint8_t*>(&g_sides), sizeof(g_sides)});
-			if (!new_id.empty()) {
-				auto& new_roll = _rolls.emplace_back();
-				new_roll.id = new_id;
-			}
+			std::vector<uint8_t> is {'D', 'I', 'C', 'E'};
+			is.push_back(reinterpret_cast<uint8_t*>(&g_sides)[0]);
+			is.push_back(reinterpret_cast<uint8_t*>(&g_sides)[1]);
+			static_assert(sizeof(g_sides) == 2);
+
+			auto new_id = _p2prng.newGernationPeers(c_vec, ByteSpan{is});
+			//if (!new_id.empty()) {
+			//}
 		}
 
 		ImGui::SeparatorText("Rolls");
 
 		// list of past rolls and their state
-		//ImGui::CollapsingHeader("d");
-		ImGui::Text("d6 [?] hmac 4/6");
-		ImGui::Text("d6 [?] secret 1/3");
-		ImGui::Text("d6 [1]");
+		for (auto it = _rolls.crbegin(); it != _rolls.crend(); it++) {
+			const auto& roll = *it;
+
+			std::string text{"d"};
+			text += std::to_string(roll.sides);
+			text += " [";
+			if (roll.state == P2PRNG::DONE) {
+				// dice start at 1
+				text += std::to_string(int(roll.final_result)+1);
+			} else {
+				text += "?";
+			}
+			text += "]";
+
+			if (roll.state == P2PRNG::INIT) {
+				text += " INIT";
+			} else if (roll.state == P2PRNG::HMAC) {
+				text += " HMAC ";
+				text += std::to_string(roll.state_number_1);
+				text += "/";
+				text += std::to_string(roll.state_number_2);
+			} else if (roll.state == P2PRNG::SECRET) {
+				text += " SECRET ";
+				text += std::to_string(roll.state_number_1);
+				text += "/";
+				text += std::to_string(roll.state_number_2);
+			}
+
+			ImGui::TextUnformatted(text.c_str());
+		}
 	}
 	ImGui::End();
 
 	return 10.f;
 }
 
-bool DiceTool::onEvent(const P2PRNG::Events::Init&) {
-	return false;
+bool DiceTool::onEvent(const P2PRNG::Events::Init& e) {
+	if (e.initial_state.size != 4+2) {
+		return false;
+	}
+
+	if (e.initial_state[0] != 'D' || e.initial_state[1] != 'I' || e.initial_state[2] != 'C' || e.initial_state[3] != 'E') {
+		return false;
+	}
+
+	auto& new_roll = _rolls.emplace_back();
+	new_roll.id = {e.id.cbegin(), e.id.cend()};
+	new_roll.state = P2PRNG::State::INIT;
+	reinterpret_cast<uint8_t*>(&new_roll.sides)[0] = e.initial_state[4];
+	reinterpret_cast<uint8_t*>(&new_roll.sides)[1] = e.initial_state[5];
+
+	return true;
 }
 
-bool DiceTool::onEvent(const P2PRNG::Events::HMAC&) {
-	return false;
+bool DiceTool::onEvent(const P2PRNG::Events::HMAC& e) {
+	auto roll_it = std::find_if(_rolls.begin(), _rolls.end(), [&e](const auto& a) -> bool { return ByteSpan{a.id} == e.id; });
+	if (roll_it == _rolls.cend()) {
+		return false;
+	}
+
+	roll_it->state = P2PRNG::State::HMAC;
+	roll_it->state_number_1 = e.have;
+	roll_it->state_number_2 = e.out_of;
+
+	return true;
 }
 
-bool DiceTool::onEvent(const P2PRNG::Events::Secret&) {
-	return false;
+bool DiceTool::onEvent(const P2PRNG::Events::Secret& e) {
+	auto roll_it = std::find_if(_rolls.begin(), _rolls.end(), [&e](const auto& a) -> bool { return ByteSpan{a.id} == e.id; });
+	if (roll_it == _rolls.cend()) {
+		return false;
+	}
+
+	roll_it->state = P2PRNG::State::SECRET;
+	roll_it->state_number_1 = e.have;
+	roll_it->state_number_2 = e.out_of;
+
+	return true;
 }
 
-bool DiceTool::onEvent(const P2PRNG::Events::Done&) {
-	std::cout << "got a done!!!!!!!!!!!!!!!!!!\n";
-	return false;
+bool DiceTool::onEvent(const P2PRNG::Events::Done& e) {
+	auto roll_it = std::find_if(_rolls.begin(), _rolls.end(), [&e](const auto& a) -> bool { return ByteSpan{a.id} == e.id; });
+	if (roll_it == _rolls.cend()) {
+		return false;
+	}
+
+	roll_it->state = P2PRNG::State::DONE;
+	roll_it->state_number_1 = 0;
+	roll_it->state_number_2 = 0;
+	roll_it->final_result = (e.result[0] | (e.result[1] << 8)) % roll_it->sides;
+
+	std::cout << "done die roll " << roll_it->final_result << "\n";
+	return true;
 }
 
-bool DiceTool::onEvent(const P2PRNG::Events::ValError&) {
+bool DiceTool::onEvent(const P2PRNG::Events::ValError& e) {
+	auto roll_it = std::find_if(_rolls.cbegin(), _rolls.cend(), [&e](const auto& a) -> bool { return ByteSpan{a.id} == e.id; });
+	if (roll_it == _rolls.cend()) {
+		return false;
+	}
+
 	return false;
 }
 
