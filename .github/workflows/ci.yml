@@ -112,7 +112,7 @@ jobs:
       run: ctest -C ${{env.BUILD_TYPE}}
 
   windows:
-    timeout-minutes: 10
+    timeout-minutes: 15
 
     runs-on: windows-latest
 
