@@ -26,6 +26,9 @@ add_subdirectory(./solanaceae_tox)
 set(SOLANACEAE_TOX_UPNP_BUILD_PLUGINS ON CACHE BOOL "")
 add_subdirectory(./solanaceae_tox_upnp)
 
+set(SOLANACEAE_TOX_P2PRNG_BUILD_PLUGINS ON CACHE BOOL "")
+add_subdirectory(./solanaceae_tox_p2prng)
+
 set(SOLANACEAE_NGCFT1_SHA1_BUILD_TESTING ${SOLANACEAE_ECOSYSTEM_BUILD_TESTING} CACHE BOOL "")
 add_subdirectory(./solanaceae_ngc_ft1)
 
