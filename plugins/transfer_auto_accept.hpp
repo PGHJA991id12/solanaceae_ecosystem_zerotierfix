@@ -10,14 +10,14 @@ struct ConfigModelI;
 
 class TransferAutoAccept : public RegistryMessageModelEventI, public ObjectStoreEventI {
 	ObjectStore2& _os;
-	RegistryMessageModel& _rmm;
+	RegistryMessageModelI& _rmm;
 	//ContactModelI& _cm;
 	ConfigModelI& _conf;
 
 	std::vector<ObjectHandle> _accept_queue;
 
 	public:
-		TransferAutoAccept(ObjectStore2& os, RegistryMessageModel& rmm, ConfigModelI& conf);
+		TransferAutoAccept(ObjectStore2& os, RegistryMessageModelI& rmm, ConfigModelI& conf);
 
 		// TODO: iterate
 		void iterate(void);

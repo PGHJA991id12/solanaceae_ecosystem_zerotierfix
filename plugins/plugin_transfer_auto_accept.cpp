@@ -33,7 +33,7 @@ SOLANA_PLUGIN_EXPORT uint32_t solana_plugin_start(struct SolanaAPI* solana_api) 
 
 	try {
 		auto* os = PLUG_RESOLVE_INSTANCE(ObjectStore2);
-		auto* rmm = PLUG_RESOLVE_INSTANCE(RegistryMessageModel);
+		auto* rmm = PLUG_RESOLVE_INSTANCE(RegistryMessageModelI);
 		auto* conf = PLUG_RESOLVE_INSTANCE(ConfigModelI);
 
 		// static store, could be anywhere tho

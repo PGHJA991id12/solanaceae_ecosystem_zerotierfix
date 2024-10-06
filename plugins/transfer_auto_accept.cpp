@@ -10,7 +10,7 @@
 
 #include <iostream>
 
-TransferAutoAccept::TransferAutoAccept(ObjectStore2& os, RegistryMessageModel& rmm, ConfigModelI& conf) : _os(os), _rmm(rmm), _conf(conf) {
+TransferAutoAccept::TransferAutoAccept(ObjectStore2& os, RegistryMessageModelI& rmm, ConfigModelI& conf) : _os(os), _rmm(rmm), _conf(conf) {
 	//_os.subscribe(this, ObjectStore_Event::object_update);
 
 	_rmm.subscribe(this, RegistryMessageModel_Event::message_construct);
