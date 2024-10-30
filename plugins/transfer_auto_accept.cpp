@@ -49,6 +49,10 @@ void TransferAutoAccept::iterate(void) {
 }
 
 void TransferAutoAccept::checkObj(ObjectHandle o) {
+	if (!o) {
+		return; // invalid object
+	}
+
 	if (o.all_of<ObjComp::Ephemeral::File::ActionTransferAccept>()) {
 		return; // already accepted
 	}
