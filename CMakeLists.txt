@@ -48,6 +48,9 @@ if (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL
 		-Wshadow # Warn if a variable declaration shadows one from a parent context
 	)
 
+	add_compile_options(-fno-omit-frame-pointer)
+	add_link_options(-fno-omit-frame-pointer)
+
 	if (NOT WIN32)
 		#link_libraries(-fsanitize=address,undefined)
 		#link_libraries(-fsanitize=undefined)
