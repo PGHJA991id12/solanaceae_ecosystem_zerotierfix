@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.9 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.14...3.24 FATAL_ERROR)
 
 set(SOLANACEAE_UTIL_BUILD_TESTING ${SOLANACEAE_ECOSYSTEM_BUILD_TESTING})
 add_subdirectory(./solanaceae_util)
