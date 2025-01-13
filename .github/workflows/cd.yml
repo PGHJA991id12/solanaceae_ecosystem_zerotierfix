@@ -67,12 +67,6 @@ jobs:
       with:
         submodules: recursive
 
-    - name: update vcpkg
-      shell: bash
-      run: |
-        cd C:/vcpkg
-        git pull
-
     - name: Export GitHub Actions cache environment variables
       uses: actions/github-script@v7
       with:
