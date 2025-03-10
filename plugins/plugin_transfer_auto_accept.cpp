@@ -1,7 +1,8 @@
 #include <solanaceae/plugin/solana_plugin_v1.h>
 
-#include "./transfer_auto_accept.hpp"
 #include <solanaceae/util/config_model.hpp>
+
+#include "./transfer_auto_accept.hpp"
 
 #include <entt/entt.hpp>
 #include <entt/fwd.hpp>

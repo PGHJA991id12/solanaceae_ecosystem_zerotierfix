@@ -1,6 +1,9 @@
 #include <solanaceae/plugin/solana_plugin_v1.h>
 
+#include <solanaceae/contact/contact_store_i.hpp>
+
 #include "./dice_tool.hpp"
+
 #include <imgui.h>
 
 #include <entt/entt.hpp>
@@ -33,11 +36,11 @@ SOLANA_PLUGIN_EXPORT uint32_t solana_plugin_start(struct SolanaAPI* solana_api) 
 
 	try {
 		auto* p2prng_i = PLUG_RESOLVE_INSTANCE(P2PRNGI);
-		auto* cr = PLUG_RESOLVE_INSTANCE_VERSIONED(Contact3Registry, "1");
+		auto* cs = PLUG_RESOLVE_INSTANCE(ContactStore4I);
 
 		// static store, could be anywhere tho
 		// construct with fetched dependencies
-		g_dt = std::make_unique<DiceTool>(*p2prng_i, *cr);
+		g_dt = std::make_unique<DiceTool>(*p2prng_i, *cs);
 
 		auto* imguic = PLUG_RESOLVE_INSTANCE_VERSIONED(ImGuiContext, ImGui::GetVersion());
 		auto* imguimemaf = PLUG_RESOLVE_INSTANCE_VERSIONED(ImGuiMemAllocFunc, ImGui::GetVersion());

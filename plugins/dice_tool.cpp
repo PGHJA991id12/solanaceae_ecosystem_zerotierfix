@@ -1,15 +1,18 @@
 #include "./dice_tool.hpp"
 
+#include <solanaceae/contact/contact_store_i.hpp>
 #include <solanaceae/contact/components.hpp>
 
 #include <imgui.h>
 
 #include <entt/container/dense_set.hpp>
+#include <entt/entity/registry.hpp>
+#include <entt/entity/handle.hpp>
 
 #include <cstdint>
 #include <iostream>
 
-DiceTool::DiceTool(P2PRNGI& p2prng, Contact3Registry& cr) : _p2prng(p2prng), _cr(cr) {
+DiceTool::DiceTool(P2PRNGI& p2prng, ContactStore4I& cs) : _p2prng(p2prng), _cs(cs) {
 	p2prng.subscribe(this, P2PRNG_Event::init);
 	p2prng.subscribe(this, P2PRNG_Event::hmac);
 	p2prng.subscribe(this, P2PRNG_Event::secret);
@@ -29,7 +32,7 @@ float DiceTool::render(float) {
 		static uint16_t g_sides {6};
 		ImGui::InputScalar("##sides", ImGuiDataType_U16, &g_sides);
 
-		static entt::dense_set<Contact3> peers;
+		static entt::dense_set<Contact4> peers;
 
 		if (ImGui::CollapsingHeader("peers")) {
 			ImGui::Indent();
@@ -43,7 +46,7 @@ float DiceTool::render(float) {
 					continue;
 				}
 
-				Contact3Handle c {_cr, *it};
+				ContactHandle4 c = _cs.contactHandle(*it);
 
 				const char* str_ptr = "<unk>";
 				if (const auto* name_ptr = c.try_get<Contact::Components::Name>(); name_ptr != nullptr && !name_ptr->name.empty()) {
@@ -61,8 +64,8 @@ float DiceTool::render(float) {
 				ImGui::OpenPopup("peer selector");
 			}
 			if (ImGui::BeginPopup("peer selector")) {
-				for (const auto& [cv] : _cr.view<Contact::Components::TagBig>().each()) {
-					Contact3Handle c {_cr, cv};
+				for (const auto& [cv] : _cs.registry().view<Contact::Components::TagBig>().each()) {
+					ContactHandle4 c = _cs.contactHandle(cv);
 
 					if (peers.contains(c)) {
 						continue;
@@ -75,8 +78,8 @@ float DiceTool::render(float) {
 
 					if (c.all_of<Contact::Components::TagGroup, Contact::Components::ParentOf>()) {
 						if (ImGui::BeginMenu(str_ptr)) {
-							for (const Contact3 child_cv : c.get<Contact::Components::ParentOf>().subs) {
-								Contact3Handle child_c {_cr, child_cv};
+							for (const Contact4 child_cv : c.get<Contact::Components::ParentOf>().subs) {
+								ContactHandle4 child_c = _cs.contactHandle(child_cv);
 
 								if (peers.contains(child_c)) {
 									continue;
@@ -113,10 +116,10 @@ float DiceTool::render(float) {
 		}
 
 		if (ImGui::Button("roll")) {
-			//std::vector<Contact3Handle> c_vec{peers.cbegin(), peers.cend()};
-			std::vector<Contact3Handle> c_vec;
+			//std::vector<ContactHandle4> c_vec{peers.cbegin(), peers.cend()};
+			std::vector<ContactHandle4> c_vec;
 			for (const auto cv : peers) {
-				c_vec.emplace_back(_cr, cv);
+				c_vec.emplace_back(_cs.contactHandle(cv));
 			}
 
 			std::vector<uint8_t> is {'D', 'I', 'C', 'E'};

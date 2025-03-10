@@ -1,13 +1,13 @@
 #pragma once
 
 #include <solanaceae/tox_p2prng/p2prng.hpp>
-#include <solanaceae/contact/contact_model3.hpp>
+#include <solanaceae/contact/fwd.hpp>
 
 #include <vector>
 
 class DiceTool : public P2PRNGEventI {
 	P2PRNGI& _p2prng;
-	Contact3Registry& _cr;
+	ContactStore4I& _cs;
 
 	struct Rolls {
 		std::vector<uint8_t> id;
@@ -23,7 +23,7 @@ class DiceTool : public P2PRNGEventI {
 	std::vector<Rolls> _rolls;
 
 	public:
-		DiceTool(P2PRNGI& p2prng, Contact3Registry& cr);
+		DiceTool(P2PRNGI& p2prng, ContactStore4I& cs);
 		~DiceTool(void);
 
 		float render(float time_delta);
