@@ -60,7 +60,12 @@ jobs:
   windows:
     timeout-minutes: 15
 
-    runs-on: windows-latest
+    runs-on: ${{matrix.os}}
+
+    strategy:
+      matrix:
+        type: ['', 'asan']
+        os: ['windows-2022']
 
     steps:
     - uses: actions/checkout@v4
@@ -85,7 +90,8 @@ jobs:
         arch: amd64
 
     - name: Configure CMake
-      run: cmake -G Ninja -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake -DVCPKG_TARGET_TRIPLET=x64-windows-static -DPKG_CONFIG_EXECUTABLE=C:/vcpkg/installed/x64-windows/tools/pkgconf/pkgconf.exe
+      # TODO: og asan had this -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded
+      run: cmake -G Ninja -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake -DVCPKG_TARGET_TRIPLET=x64-windows-static -DPKG_CONFIG_EXECUTABLE=C:/vcpkg/installed/x64-windows/tools/pkgconf/pkgconf.exe -DSOLANACEAE_ECOSYSTEM_ASAN=${{matrix.type == 'asan' && 'ON' || 'OFF'}}
 
     - name: Build
       run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
@@ -112,15 +118,18 @@ jobs:
     - name: Compress artifacts
       shell: powershell
       run: |
-        Compress-Archive -Path ${{github.workspace}}/build/bin/* -Destination ${{ github.event.repository.name }}-${{ steps.tag.outputs.name }}-${{ runner.os }}-msvc-x86_64.zip
+        Compress-Archive -Path ${{github.workspace}}/build/bin/* -Destination ${{ github.event.repository.name }}-${{ steps.tag.outputs.name }}-${{ runner.os }}-msvc${{matrix.type == 'asan' && '-asan' || ''}}-x86_64.zip
+
+    # TODO: add asan runtime dep ?
+    # only needed by totato, loading asan in non asan host is incompatible anyway
 
     - uses: actions/upload-artifact@v4
       with:
         # TODO: simpler name?
-        name: ${{ github.event.repository.name }}-${{ steps.tag.outputs.name }}-${{ runner.os }}-msvc-x86_64
+        name: ${{ github.event.repository.name }}-${{ steps.tag.outputs.name }}-${{ runner.os }}-msvc${{matrix.type == 'asan' && '-asan' || ''}}-x86_64
         # TODO: do propper packing
         path: |
-          ${{github.workspace}}/${{ github.event.repository.name }}-${{ steps.tag.outputs.name }}-${{ runner.os }}-msvc-x86_64.zip
+          ${{github.workspace}}/${{ github.event.repository.name }}-${{ steps.tag.outputs.name }}-${{ runner.os }}-msvc${{matrix.type == 'asan' && '-asan' || ''}}-x86_64.zip
 
   release:
     if: ${{ ( github.event_name == 'push' && github.ref == 'refs/heads/master' ) }}
