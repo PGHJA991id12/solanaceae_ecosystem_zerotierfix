@@ -49,5 +49,9 @@ add_subdirectory(./solanaceae_crdtnotes)
 set(SOLANACEAE_LLAMA-CPP-WEB_BUILD_PLUGINS ON CACHE BOOL "")
 add_subdirectory(./solanaceae_llama-cpp-web)
 
+set(SOLANACEAE_VCG_BUILD_PLUGINS ON CACHE BOOL "")
+set(SOLANACEAE_VCG_BUILD_TESTING ${SOLANACEAE_ECOSYSTEM_BUILD_TESTING} CACHE BOOL "")
+add_subdirectory(./solanaceae_vcg)
+
 add_subdirectory(./totato)
 

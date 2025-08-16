@@ -62,3 +62,6 @@
 [submodule "external/solanaceae_tox_p2prng"]
 	path = external/solanaceae_tox_p2prng
 	url = https://github.com/Green-Sky/solanaceae_tox_p2prng.git
+[submodule "external/solanaceae_vcg"]
+	path = external/solanaceae_vcg
+	url = https://github.com/MadeOfJelly/solanaceae_vcg.git
