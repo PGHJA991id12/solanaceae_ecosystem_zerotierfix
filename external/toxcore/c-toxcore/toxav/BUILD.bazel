@@ -1,0 +1,78 @@
+load("@rules_cc//cc:defs.bzl", "cc_test")
+load("//tools:no_undefined.bzl", "cc_library")
+
+exports_files(
+    srcs = ["toxav.h"],
+    visibility = ["//c-toxcore:__pkg__"],
+)
+
+# Private library with the public API header in it because in toxav, lots of
+# things depend on the public API header.
+cc_library(
+    name = "public_api",
+    hdrs = ["toxav.h"],
+)
+
+cc_library(
+    name = "ring_buffer",
+    srcs = ["ring_buffer.c"],
+    hdrs = ["ring_buffer.h"],
+    deps = ["//c-toxcore/toxcore:ccompat"],
+)
+
+cc_test(
+    name = "ring_buffer_test",
+    size = "small",
+    srcs = ["ring_buffer_test.cc"],
+    deps = [
+        ":ring_buffer",
+        "@com_google_googletest//:gtest",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_library(
+    name = "ring_buffer_srcs",
+    hdrs = [
+        "ring_buffer.c",
+        "ring_buffer.h",
+    ],
+    visibility = ["//c-toxcore/testing:__pkg__"],
+    deps = ["//c-toxcore/toxcore:ccompat"],
+)
+
+cc_library(
+    name = "toxav",
+    srcs = glob(
+        [
+            "*.c",
+            "*.h",
+        ],
+        exclude = ["toxav.h"],
+    ),
+    hdrs = ["toxav.h"],
+    visibility = ["//c-toxcore:__subpackages__"],
+    deps = [
+        "//c-toxcore/toxcore:Messenger",
+        "//c-toxcore/toxcore:ccompat",
+        "//c-toxcore/toxcore:group",
+        "//c-toxcore/toxcore:logger",
+        "//c-toxcore/toxcore:mono_time",
+        "//c-toxcore/toxcore:net_crypto",
+        "//c-toxcore/toxcore:network",
+        "//c-toxcore/toxcore:tox",
+        "//c-toxcore/toxcore:util",
+        "@libsodium",
+        "@libvpx",
+        "@opus",
+    ],
+)
+
+sh_library(
+    name = "cimple_files",
+    srcs = glob([
+        "*.c",
+        "*.h",
+    ]),
+    visibility = ["//c-toxcore/testing:__pkg__"],
+)

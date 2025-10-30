@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+
+set -eux
+
+docker_build() {
+  DOCKER_BUILDKIT=1 docker build --progress=plain -f other/bootstrap_daemon/docker/Dockerfile -t toxchat/bootstrap-node .
+}
+
+# Run Docker build once. If it succeeds, we're good.
+if docker_build; then
+  exit 0
+fi
+
+# We're not good. Run it again, but now capture the output.
+OUTPUT=$(docker_build 2>&1 || true)
+
+if echo "$OUTPUT" | grep '/usr/local/bin/tox-bootstrapd: FAILED'; then
+  # This is a checksum warning, so we need to update it.
+  echo "$OUTPUT" | grep -Eo '[0-9a-f]{64}  /usr/local/bin/tox-bootstrapd' | tail -n1 >other/bootstrap_daemon/docker/tox-bootstrapd.sha256
+fi
+
+# Run once last time to complete the build.
+docker_build

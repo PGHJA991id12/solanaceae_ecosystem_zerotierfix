@@ -1,0 +1,126 @@
+---
+version: 2
+
+workflows:
+  version: 2
+  circleci:
+    jobs:
+      - bazel-asan
+      - bazel-dbg
+      - bazel-opt
+      - clang-analyze
+      - cpplint
+      - static-analysis
+      - cimplefmt
+      - generate-events
+
+jobs:
+  bazel-asan:
+    working_directory: /tmp/cirrus-ci-build
+    docker:
+      - image: toxchat/toktok-stack:latest-asan
+
+    steps:
+      - checkout
+      - run: .circleci/bazel-test
+          //c-toxcore/...
+
+  bazel-dbg:
+    working_directory: /tmp/cirrus-ci-build
+    docker:
+      - image: toxchat/toktok-stack:latest-debug
+
+    steps:
+      - checkout
+      - run: .circleci/bazel-test
+          //c-toxcore/...
+
+  bazel-opt:
+    working_directory: /tmp/cirrus-ci-build
+    docker:
+      - image: toxchat/toktok-stack:latest-release
+
+    steps:
+      - checkout
+      - run: .circleci/bazel-test
+          //c-toxcore/...
+
+  static-analysis:
+    working_directory: ~/work
+    docker:
+      - image: ubuntu
+
+    steps:
+      - run: &apt_install
+          apt-get update &&
+          DEBIAN_FRONTEND=noninteractive
+          apt-get install -y
+            ca-certificates
+            clang
+            cmake
+            git
+            libbenchmark-dev
+            libconfig-dev
+            libgmock-dev
+            libgtest-dev
+            libopus-dev
+            libsodium-dev
+            libvpx-dev
+            llvm-dev
+            ninja-build
+            pkg-config
+      - run:
+          apt-get install -y --no-install-recommends
+            ca-certificates
+            g++
+            llvm-dev
+      - checkout
+      - run: git submodule update --init --recursive
+      - run: other/analysis/check_includes
+      - run: other/analysis/check_logger_levels
+      - run: other/analysis/run-clang
+      - run: other/analysis/run-gcc
+
+  clang-analyze:
+    working_directory: ~/work
+    docker:
+      - image: ubuntu
+
+    steps:
+      - run: *apt_install
+      - checkout
+      - run: git submodule update --init --recursive
+      - run: other/analysis/run-clang-analyze
+
+  cpplint:
+    working_directory: ~/work
+    docker:
+      - image: ubuntu
+
+    steps:
+      - run: *apt_install
+      - run:
+          apt-get install -y --no-install-recommends
+            cpplint
+      - checkout
+      - run: git submodule update --init --recursive
+      - run: other/analysis/run-cpplint
+
+  cimplefmt:
+    working_directory: ~/work
+    machine: { image: ubuntu-2204:current }
+
+    steps:
+      - checkout
+      - run: git submodule update --init --recursive
+      - run: other/docker/cimplefmt/run -u $(find tox* -name "*.[ch]")
+
+  generate-events:
+    working_directory: ~/work
+    machine: { image: ubuntu-2204:current }
+
+    steps:
+      - checkout
+      - run: git submodule update --init --recursive
+      - run: other/event_tooling/run
+      - run: git diff --exit-code
